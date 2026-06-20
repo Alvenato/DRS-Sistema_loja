@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     <title>Cadastro de Cliente</title>
 </head>
 <body>
     <div class="wrapper">
         <nav class="sidebar">
             <div class="sidebar-logo-container">
-                <img src="static/images/logo.png" class="sidebar-logo" alt="Logo Menu">
+                <img src="images/logo.png" class="sidebar-logo" alt="Logo Menu" onerror="this.style.display='none'">
             </div>
             <h3 class="sidebar-title">PDV Control</h3>
             
@@ -50,7 +50,7 @@
             </form>
 
             <div class="clientes-cadastrados-container" style="margin-top: 40px;">
-                <h3 style="margin-bottom: 15px; color: var(--text-dark); font-weight: 600;">Clientes Cadastrados</h3>
+                <h3 style="margin-bottom: 15px;">Clientes Cadastrados</h3>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -62,7 +62,7 @@
                             </tr>
                         </thead>
                         <tbody id="lista-clientes">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -73,91 +73,57 @@
         // --- BANCO DE DADOS DE SIMULAÇÃO ---
         const mockClientes = [
             { nome: "João Silva", email: "joao@email.com", whatsapp: "(61) 99999-1111", telefone: "", cidade: "Brasília", uf: "DF" },
-            { nome: "Maria Oliveira", email: "maria@email.com", whatsapp: "(61) 98888-2222", telefone: "", cidade: "Valparaíso de Goiás", uf: "GO" },
-            { nome: "Carlos Santos", email: "", whatsapp: "", telefone: "(61) 3333-4444", cidade: "Gama", uf: "DF" }
+            { nome: "Maria Oliveira", email: "maria@email.com", whatsapp: "(61) 98888-2222", telefone: "", cidade: "Valparaíso de Goiás", uf: "GO" }
         ];
 
-        // --- INICIALIZAÇÃO DA TELA ---
-        document.addEventListener("DOMContentLoaded", function() {
-            renderizarTabela();
-        });
+        document.addEventListener("DOMContentLoaded", renderizarTabela);
 
-        // Função responsável por atualizar a tabela na tela
         function renderizarTabela() {
             const tbody = document.getElementById('lista-clientes');
-            tbody.innerHTML = ""; // Limpa a tabela
-
-            if (mockClientes.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" style="padding: 20px; text-align: center; color: var(--text-light); font-style: italic;">Nenhum cliente cadastrado até o momento.</td>
-                    </tr>`;
-                return;
-            }
+            tbody.innerHTML = ""; 
 
             mockClientes.forEach(cliente => {
                 const tr = document.createElement('tr');
-                
-                // Define o contato preferencial (WhatsApp, se não tiver vai Telefone, se não '-' )
-                const contato = cliente.whatsapp || cliente.telefone || '-';
-                const localidade = (cliente.cidade || cliente.uf) ? `${cliente.cidade || '-'}/${cliente.uf || '-'}` : '-';
-
                 tr.innerHTML = `
                     <td>${cliente.nome}</td>
                     <td>${cliente.email || '-'}</td>
-                    <td>${contato}</td>
-                    <td>${localidade}</td>
+                    <td>${cliente.whatsapp || cliente.telefone || '-'}</td>
+                    <td>${cliente.cidade || '-'}/${cliente.uf || '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // --- INTERCEPTAR FORMULÁRIO E SIMULAR CADASTRO ---
-        document.getElementById('form-cliente').addEventListener('submit', function(event) {
-            event.preventDefault(); // Impede o recarregamento da página
-
-            // Captura os dados digitados
-            const novoCliente = {
+        document.getElementById('form-cliente').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const novo = {
                 nome: document.getElementById('nome').value,
                 email: document.getElementById('email').value,
-                telefone: document.getElementById('telefone').value,
                 whatsapp: document.getElementById('whatsapp').value,
                 cidade: document.getElementById('cidade').value,
                 uf: document.getElementById('uf').value
             };
-
-            // Adiciona no nosso banco de dados fake e atualiza a interface
-            mockClientes.push(novoCliente);
+            mockClientes.push(novo);
             renderizarTabela();
-
-            // Limpa os campos do formulário para o próximo cadastro
-            document.getElementById('form-cliente').reset();
-            alert("Cliente cadastrado com sucesso! (Simulado localmente)");
+            this.reset();
         });
 
-        // --- SISTEMA VIA CEP (Mantido original) ---
+        // Função ViaCEP mantida
         function meu_callback(conteudo) {
             if (!("erro" in conteudo)) {
-                document.getElementById('logradouro').value=(conteudo.logradouro);
-                document.getElementById('bairro').value=(conteudo.bairro);
-                document.getElementById('cidade').value=(conteudo.localidade);
-                document.getElementById('uf').value=(conteudo.uf);
-            } else {
-                alert("CEP não encontrado.");
+                document.getElementById('logradouro').value = conteudo.logradouro;
+                document.getElementById('bairro').value = conteudo.bairro;
+                document.getElementById('cidade').value = conteudo.localidade;
+                document.getElementById('uf').value = conteudo.uf;
             }
         }
         
         function pesquisacep(valor) {
-            var cep = valor.replace(/\D/g, '');
-            if (cep != "") {
-                var validacep = /^[0-9]{8}$/;
-                if(validacep.test(cep)) {
-                    var script = document.createElement('script');
-                    script.src = 'https://viacep.com.br/ws/'+ cep + '/json/?callback=meu_callback';
-                    document.body.appendChild(script);
-                } else {
-                    alert("Formato de CEP inválido.");
-                }
+            let cep = valor.replace(/\D/g, '');
+            if (cep.length === 8) {
+                let script = document.createElement('script');
+                script.src = `https://viacep.com.br/ws/${cep}/json/?callback=meu_callback`;
+                document.body.appendChild(script);
             }
         }
     </script>
