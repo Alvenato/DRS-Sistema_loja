@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/css/style.css">
+    <!-- Ajuste: Removido 'static/' do caminho -->
+    <link rel="stylesheet" href="css/style.css">
     <title>Painel - Vendas</title>
     <style>
         .filter-container { background: #f8fafc; border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
@@ -28,7 +29,8 @@
     <div class="wrapper">
         <nav class="sidebar">
             <div class="sidebar-logo-container">
-                <img src="static/images/logo.png" alt="Logo" class="sidebar-logo" onerror="this.style.display='none'">
+                <!-- Ajuste: Removido 'static/' do caminho -->
+                <img src="images/logo.png" alt="Logo" class="sidebar-logo" onerror="this.style.display='none'">
             </div>
             <h3 class="sidebar-title">PDV Control</h3>
             
@@ -91,14 +93,14 @@
                         </tr>
                     </thead>
                     <tbody id="vendas-table-body">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </main>
     </div>
 
     <script>
-        // --- BANCO DE DADOS LOCAL DE HISTÓRICO (MOCK) ---
+        // O restante do seu código permanece igual, mantendo a lógica de filtros e renderização
         const mockVendas = [
             { id: 1024, cliente: "Carlos Silva", data: "15/05/2026", chave_nfce: "35260510521453000194650010001245781254789632", valor: 154.90, metodo: "pix" },
             { id: 1025, cliente: "Mariana Costa", data: "18/06/2026", chave_nfce: "35260610521453000194650010001245781254789654", valor: 45.00, metodo: "dinheiro" },
@@ -107,49 +109,41 @@
             { id: 1028, cliente: "Ana Beatriz", data: "20/06/2026", chave_nfce: "35260610521453000194650010001245781254790123", valor: 12.50, metodo: "pix" }
         ];
 
-        // --- INICIALIZAÇÃO DO COMPONENTE ---
         document.addEventListener("DOMContentLoaded", function() {
             carregarOpcoesFiltros();
             processarDados(mockVendas);
 
-            // Interceptador de Submissão de Filtro
             document.getElementById('filterForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 executarFiltro();
             });
 
-            // Ação do Botão Limpar Filtros
             document.getElementById('btnClear').addEventListener('click', function() {
                 document.getElementById('filterForm').reset();
                 processarDados(mockVendas);
             });
         });
 
-        // --- CONSTRUTOR DINÂMICO DOS SELECTS ---
         function carregarOpcoesFiltros() {
             const selectDia = document.getElementById('filter-dia');
             const selectMes = document.getElementById('filter-mes');
             const selectAno = document.getElementById('filter-ano');
 
-            // Gerar dias (01 a 31)
             for (let d = 1; d <= 31; d++) {
                 let valorFormatado = String(d).padStart(2, '0');
                 selectDia.options[selectDia.options.length] = new Option(valorFormatado, valorFormatado);
             }
 
-            // Gerar meses (01 a 12)
             for (let m = 1; m <= 12; m++) {
                 let valorFormatado = String(m).padStart(2, '0');
                 selectMes.options[selectMes.options.length] = new Option(valorFormatado, valorFormatado);
             }
 
-            // Gerar anos de escopo (2024 a 2030)
             for (let y = 2024; y <= 2030; y++) {
                 selectAno.options[selectAno.options.length] = new Option(y, y);
             }
         }
 
-        // --- PROCESSAMENTO PRINCIPAL (TABELA + MÉTRICAS) ---
         function processarDados(vendasParaExibir) {
             renderizarTabela(vendasParaExibir);
             calcularMetricas(vendasParaExibir);
@@ -207,14 +201,12 @@
             document.getElementById('faturamento-debito').textContent = `R$ ${debito.toFixed(2)}`;
         }
 
-        // --- LÓGICA DE FILTRAGEM LOCAL ---
         function executarFiltro() {
             const filtroDia = document.getElementById('filter-dia').value;
             const filtroMes = document.getElementById('filter-mes').value;
             const filtroAno = document.getElementById('filter-ano').value;
 
             const resultado = mockVendas.filter(v => {
-                // Estrutura do mock: "DD/MM/YYYY" -> split quebra nas barras
                 const partesData = v.data.split('/');
                 const diaVenda = partesData[0];
                 const mesVenda = partesData[1];
@@ -230,19 +222,16 @@
             processarDados(resultado);
         }
 
-        // --- SISTEMA DE REMOÇÃO LOCAL ---
         function removerVenda(id) {
             if (confirm('Tem certeza que deseja apagar o registro desta venda? Esta ação não pode ser desfeita.')) {
                 const idx = mockVendas.findIndex(v => v.id === id);
                 if (idx !== -1) {
                     mockVendas.splice(idx, 1);
-                    // Atualiza a visualização baseando-se no filtro ativo atual
                     executarFiltro();
                 }
             }
         }
 
-        // --- EMISSÃO SIMULADA DE CUPOM ---
         function emitirCupom(id) {
             alert(`Impressão iniciada! Cupom fiscal referente à venda #${id} enviado para o gerenciador do sistema.`);
         }
