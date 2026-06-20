@@ -2,66 +2,77 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Cupom Fiscal</title>
+    <title>Sistema de Gestão e Cupom Fiscal</title>
     <link rel="stylesheet" href="css/style.css">
+    
     <style>
-        /* Estilos mantidos conforme seu design original */
-        body { background: #f8fafc; margin: 0; padding: 40px 20px; font-family: sans-serif; display: flex; justify-content: center; }
-        .cupom-fiscal-wrapper { background: #ffffff; padding: 25px 20px; width: 320px; border: 1px solid #e2e8f0; border-radius: 8px; }
-        @media print { .no-print { display: none !important; } }
+        body { background: #f8fafc; margin: 0; padding: 40px 20px; font-family: sans-serif; display: flex; justify-content: center; align-items: center; }
+        .main-container { width: 100%; max-width: 360px; margin: 0 auto; }
+        .title-screen { text-align: center; color: #334155; margin-bottom: 20px; font-size: 22px; }
+
+        @media print {
+            body { background: #ffffff !important; display: flex !important; justify-content: center !important; margin: 0 !important; padding: 0 !important; }
+            body * { visibility: hidden; }
+            .cupom-fiscal-wrapper, .cupom-fiscal-wrapper * { visibility: visible; }
+            .cupom-fiscal-wrapper { position: absolute !important; left: 50% !important; transform: translateX(-50%) !important; top: 0 !important; width: 320px !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+            .no-print { display: none !important; }
+        }
     </style>
 </head>
 <body>
 
     <div class="main-container">
-        <div class="no-print" style="margin-bottom: 15px;">
-            <button onclick="enviarLinkWhatsapp()" style="background: #25D366; color: white; width: 100%; height: 48px; border-radius: 8px; border: none; cursor: pointer;">
-                Enviar por WhatsApp
+        <h2 class="title-screen no-print">Visualização do Cupom Fiscal</h2>
+        
+        <div class="no-print" style="margin-bottom: 15px; text-align: center;">
+            <button onclick="enviarLinkWhatsapp()" style="background: #25D366; color: white; border: none; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; height: 48px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+                Enviar Link do Cupom por WhatsApp
             </button>
         </div>
         
-        <div class="cupom-fiscal-wrapper">
-            <div style="text-align: center; font-family: 'Courier New', monospace; font-size: 11px;">
-                <h3 id="nome-empresa">DEOCLECIANO RODRIGUES DA SILVA - ME</h3>
-                <p>CNPJ: 26.785.852/0001-25</p>
+        <div class="cupom-fiscal-wrapper" style="background: #ffffff; padding: 25px 20px; width: 320px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box;">
+            
+            <div class="center" style="text-align: center; font-family: 'Courier New', monospace; font-size: 11px; color: #000; line-height: 1.4;">
+                <img src="images/logo.png" style="display: block; margin: 0 auto 12px auto; max-width: 140px; max-height: 90px;" alt="Logo" onerror="this.style.display='none'">
+                <h3 style="margin: 0 0 6px 0; font-size: 12px; font-weight: bold;">DEOCLECIANO RODRIGUES DA SILVA - ME</h3>
+                <p style="margin: 2px 0;">CNPJ: 26.785.852/0001-25</p>
+                <div style="border-top: 1px dashed #000; margin: 10px 0;"></div>
+            </div>
+
+            <div id="conteudo-cupom" style="font-family: 'Courier New', monospace; font-size: 11px; color: #000;">
+                <p>CONSUMIDOR: <span id="cliente-nome">---</span></p>
+                <p>EMISSÃO: <span id="data-emissao">---</span></p>
                 <div style="border-top: 1px dashed #000; margin: 10px 0;"></div>
                 
-                <table style="width: 100%; text-align: left;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr><th style="text-align: left;">DESCRIÇÃO</th><th style="text-align: right;">TOTAL</th></tr>
+                    </thead>
                     <tbody id="lista-itens">
                         </tbody>
                 </table>
-                
-                <div style="border-top: 1px dashed #000; margin: 10px 0;"></div>
-                <div style="font-size: 16px; font-weight: bold;">
-                    TOTAL: R$ <span id="valor-total">0.00</span>
-                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Exemplo: Dados que viriam do seu banco de dados ou URL
-        const dadosVenda = {
-            cliente: "João Silva",
-            total: "150.00",
-            telefone: "61999991111",
-            itens: [
-                { desc: "Camiseta Preta", qtd: 1, preco: 50.00 },
-                { desc: "Calça Jeans", qtd: 1, preco: 100.00 }
-            ]
-        };
-
-        // Renderiza itens
-        const tbody = document.getElementById('lista-itens');
-        dadosVenda.itens.forEach(item => {
-            tbody.innerHTML += `<tr><td>${item.desc}</td><td>${item.qtd}</td><td>${item.preco.toFixed(2)}</td></tr>`;
-        });
-        document.getElementById('valor-total').innerText = dadosVenda.total;
-
+        // Função para simular o comportamento de envio sem o Python/Flask
         function enviarLinkWhatsapp() {
-            let texto = `Olá! Segue seu cupom: ${window.location.href}`;
-            window.open(`https://wa.me/55${dadosVenda.telefone}?text=${encodeURIComponent(texto)}`, "_blank");
+            let fone = prompt("Insira o número do cliente com DDD (apenas números):");
+            if (!fone) return;
+            
+            let urlCupom = window.location.href; // Envia a página atual
+            let texto = encodeURIComponent("Olá! Segue o link do seu cupom fiscal:\n" + urlCupom);
+            window.open("https://wa.me/55" + fone.replace(/\D/g, '') + "?text=" + texto, "_blank");
+        }
+
+        // Dica: Se quiser que o cupom seja preenchido automaticamente, 
+        // você pode ler parâmetros da URL: cupom.html?cliente=Joao&total=50
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('cliente')) {
+            document.getElementById('cliente-nome').innerText = urlParams.get('cliente');
         }
     </script>
+
 </body>
 </html>
